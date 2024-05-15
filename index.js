@@ -421,9 +421,11 @@ class Candidate {
 
 var c_holes = -1.76;
 var c_height = -0.51;
-var c_clear = 1.06;
+var c_clear = 1.16;
 var c_low = 0.25;
 var c_bump = -0.184;
+
+//clogging constant (blocking off an open column)
 
 function getBestMove(){
     var candidates=[];
@@ -450,9 +452,10 @@ function getBestMove(){
             var ms=((getHoles(gb)*c_holes)+(c_clear*getCompleteLines(gb))+/*(c_height*getAggregateHeight(gb))*/+(c_low*temp.pos[1])+(c_bump*getBumpiness(gb)));
 
             //AGGREGATE HEIGHT LAST 2 LINES NOT REALLY WORKING SDFISJFOJSEFIJDOSFJODSIJFOISDJFIO
+            //DELTA HOLES?
+            debug(getHoles(getGameBoard(getOccupiedSquares)));
 
             //test.push(getAggregateHeight(l));
-            debug(ms);
             //debug(getAggregateHeight(l));
             //console.log((getAggregateHeight(l)));
             debugger;
@@ -487,7 +490,7 @@ function autoMove(){
 
 //INIT
 getBestMove();
-var autoSpeed=100;
+var autoSpeed=10;
 
 //   main game loop    //
 function loop(){
@@ -531,6 +534,8 @@ function loop(){
         draw(pieces, queue);
         window.requestAnimationFrame(loop);
         calc=false;
+    } else{
+        location.reload()
     }
 }
 
