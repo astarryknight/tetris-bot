@@ -20,8 +20,23 @@
     </style>
   </head>
   <body>
-    <canvas id="canvas" width="750" height="600"></canvas>
-    <p id="pps"></p>
+    <div style="display:flex;flex-direction:row;">
+      <div style="display:flex;flex-direction:column;justify-content: center;">
+        <label>Holes constant</label>
+        <input id="holes" type="range" min="-2" max="2"></input>
+        <label>Clear constant</label>
+        <input id="clear" type="range" min="-2" max="2"></input>
+        <label>Piece Height constant</label>
+        <input id="low" type="range" min="-2" max="2"></input>
+        <label>Bumpiness constant</label>
+        <input id="bump" type="range" min="-2" max="2"></input>
+      </div>
+      <canvas id="canvas" width="750" height="600"></canvas>
+    </div>
+    <div style="display:flex;flex-direction:row;justify-content:space-betweensheets;">
+      <p id="pps"></p>
+      <p id="clears"></p>
+    </div>
     <p id="debug" style="word-wrap: break-word;"></p>
     <script src="index.js"></script>
   </body>

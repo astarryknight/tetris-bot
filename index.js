@@ -1,6 +1,6 @@
 //NO CONSOLE>GLIJDGLSIDJFLDSJF
 function debug(text){
-    document.getElementById("debug").textContent=text;
+    //document.getElementById("debug").textContent=text;
 }
 
 window.onerror = function(e, url, line){
@@ -8,12 +8,11 @@ window.onerror = function(e, url, line){
     return true;
 }
 
-
+var auto=true;
 
 const canvasWidth = 450;
 const canvasHeight = 600;
 const squareHeight = 30;
-var auto=true;
 
 const height = canvasHeight/squareHeight;
 const width = canvasWidth/squareHeight;
@@ -97,6 +96,7 @@ function draw(pieces, queue) {
         ctx.fillText("Held Piece:", (width+6)*squareHeight, 50);
     }
     document.getElementById("pps").textContent = "PPS: "+getPPS();
+    document.getElementById("clears").textContent = "Clears: "+totalClears;
 }
 
 /*https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object*/
@@ -180,6 +180,8 @@ pieces.push(getRandomPiece());
 var queue=[getRandomPiece(), getRandomPiece(), getRandomPiece(), getRandomPiece()];
 var free=true; //the piece is free from other pieces (not contacting)
 var hold=true; //can you hold a new piece
+
+var totalClears=0;
 
 
 window.addEventListener("load", draw(pieces, queue));
@@ -290,6 +292,7 @@ function clearRows(r){
 
             //LOOK AT PEIOCE ROTATUOIBNS DUIFHSD IFUHS DIFUSHD IFUHS DIUFHSD UIFHDFS ROTATION
         }
+        totalClears++;
     }
     //debugger;
 }
@@ -420,10 +423,26 @@ class Candidate {
 }
 
 var c_holes = -1.76;
-var c_height = -0.51;
+// var c_height = -0.51;
 var c_clear = 1.16;
 var c_low = 0.25;
 var c_bump = -0.184;
+
+//event listeners for inputs to edit constants
+var h=document.getElementById("holes");
+var c=document.getElementById("clear");
+var l=document.getElementById("low");
+var b=document.getElementById("bump");
+h.addEventListener("change", ()=>{c_holes=h.value});
+c.addEventListener("change", ()=>{c_clear=c.value});
+l.addEventListener("change", ()=>{c_low=l.value});
+b.addEventListener("change", ()=>{c_bump=b.value});
+
+//init values
+h.value=c_holes;
+c.value=c_clear;
+l.value=c_low;
+b.value=c_bump;
 
 //clogging constant (blocking off an open column)
 
