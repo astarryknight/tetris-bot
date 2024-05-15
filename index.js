@@ -1,6 +1,6 @@
 //NO CONSOLE>GLIJDGLSIDJFLDSJF
 function debug(text){
-    //document.getElementById("debug").textContent=text;
+    document.getElementById("debug").textContent=text;
 }
 
 window.onerror = function(e, url, line){
@@ -97,6 +97,7 @@ function draw(pieces, queue) {
     }
     document.getElementById("pps").textContent = "PPS: "+getPPS();
     document.getElementById("clears").textContent = "Clears: "+totalClears;
+    document.getElementById("score").textContent = "Score: "+score;
 }
 
 /*https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object*/
@@ -182,6 +183,7 @@ var free=true; //the piece is free from other pieces (not contacting)
 var hold=true; //can you hold a new piece
 
 var totalClears=0;
+var score=0;
 
 
 window.addEventListener("load", draw(pieces, queue));
@@ -273,6 +275,10 @@ function getFullRows(l){
 }
 
 function clearRows(r){
+    if(r.length==1){score+=(Math.floor(totalClears/10)+1)*40}
+    else if(r.length==2){score+=(Math.floor(totalClears/10)+1)*100}
+    else if(r.length==3){score+=(Math.floor(totalClears/10)+1)*300}
+    else{score+=(Math.floor(totalClears/10)+1)*1200}
     for(i=0;i<r.length;i++){ //iterating through each full row
         for(j=1;j<pieces.length;j++){ //iterating through each piece in the pieces array
             var p=pieces[j].piecePos; //array for piece definition positions
@@ -405,6 +411,29 @@ function getHoles(gb){
     return holes;
 }
 
+function isClogging(x, gb, temp){
+    if((temp.id==0||temp.id==1)&&(x+1)<width){
+        var oldH=getColumnHeight(x+1, getGameBoard(getOccupiedSquares()));
+        var newH=getColumnHeight(x+1, gb);
+        if((oldH==0&&newH!=0)||(newH-oldH)>3){return newH-oldH;}
+        //if(newH-oldH>=2&&newH<gb[newH-1][x]==0){ return newH-oldH; }
+
+        //l and j clog OTHER lines than the ones their x occupies...
+        //J&T clogs line to the right and l clogs line to the left
+        //CHECK THOSE AND 500+
+
+        return 0;
+    } else if (temp.id==5&&(x-1)>0){
+        var oldH=getColumnHeight(x-1, getGameBoard(getOccupiedSquares()));
+        var newH=getColumnHeight(x-1, gb);
+        if((oldH==0&&newH!=0)||(newH-oldH)>3){return newH-oldH;}
+        return 0;
+    }
+    else{
+        return 0;
+    }
+} //test this
+
 class Candidate {
     constructor(moveX, rotation, moveScore) {
         this.moveX_ = moveX;
@@ -427,6 +456,8 @@ var c_holes = -1.76;
 var c_clear = 1.16;
 var c_low = 0.25;
 var c_bump = -0.184;
+
+var c_clog=-3.5;
 
 //event listeners for inputs to edit constants
 var h=document.getElementById("holes");
@@ -453,7 +484,7 @@ function getBestMove(){
     var y=pieces[0].pos[1];
     var temp = new Piece([x,y], pieces[0].piecePos, "#B4B3B3", pieces[0].id);
     //duplicate piece and test all x values and rotations at lowest point, assign score and add to array - return highest score
-    while((temp.id==4||temp.id==6)?(x<width):(x<width-1)){ //wow much bug (not lol)
+    while((temp.id==4||temp.id==6)?(x<width):(temp.id==3)||(temp.id==2)||(temp.id==0)?(x<width-3):(x<width-1)){ //wow much bug (not lol)
         var r=0;
         while(r<4){
             y=pieces[0].pos[1];
@@ -468,11 +499,11 @@ function getBestMove(){
             var l=getTempOccupiedSquares(temp);
             var gb=getGameBoard(l);
             //var ms=((getHoles(l))*c_holes)+(c_low*temp.pos[1])+(c_clear*getCompleteLines(l));
-            var ms=((getHoles(gb)*c_holes)+(c_clear*getCompleteLines(gb))+/*(c_height*getAggregateHeight(gb))*/+(c_low*temp.pos[1])+(c_bump*getBumpiness(gb)));
+            var ms=((getHoles(gb)*c_holes)+(c_clear*getCompleteLines(gb))+/*(c_height*getAggregateHeight(gb))*/+(c_low*temp.pos[1])+(c_bump*getBumpiness(gb))+(c_clog*isClogging(temp.pos[0], gb, temp)));
 
             //AGGREGATE HEIGHT LAST 2 LINES NOT REALLY WORKING SDFISJFOJSEFIJDOSFJODSIJFOISDJFIO
             //DELTA HOLES?
-            debug(getHoles(getGameBoard(getOccupiedSquares)));
+            debug(getHoles(gb));
 
             //test.push(getAggregateHeight(l));
             //debug(getAggregateHeight(l));
@@ -554,7 +585,8 @@ function loop(){
         window.requestAnimationFrame(loop);
         calc=false;
     } else{
-        location.reload()
+        alert("Total Lines Cleared: "+totalClears);
+        //location.reload();
     }
 }
 
