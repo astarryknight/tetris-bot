@@ -484,7 +484,7 @@ function getBestMove(){
     var y=pieces[0].pos[1];
     var temp = new Piece([x,y], pieces[0].piecePos, "#B4B3B3", pieces[0].id);
     //duplicate piece and test all x values and rotations at lowest point, assign score and add to array - return highest score
-    while((temp.id==4||temp.id==6)?(x<width):(temp.id==3)||(temp.id==2)||(temp.id==0)?(x<width-3):(x<width-1)){ //wow much bug (not lol)
+    while((temp.id==4)?(x<width):(temp.id==3)||(temp.id==2)||(temp.id==0)?(x<width-3):(temp.id==1)?(x<width-2):(x<width-1)){ //wow much bug (not lol)
         var r=0;
         while(r<4){
             y=pieces[0].pos[1];
