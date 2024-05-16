@@ -501,7 +501,7 @@ function getBestMove(){
             //var ms=((getHoles(l))*c_holes)+(c_low*temp.pos[1])+(c_clear*getCompleteLines(l));
             var ms=((getHoles(gb)*c_holes)+(c_clear*getCompleteLines(gb))+/*(c_height*getAggregateHeight(gb))*/+(c_low*temp.pos[1])+(c_bump*getBumpiness(gb))+(c_clog*isClogging(temp.pos[0], gb, temp)));
             
-            if(temp.id==1&&(r==2)&&(temp.pos[0]==13)){ms=-99999999999;} //DONT DO IT
+            if(temp.id==1&&(r==2)&&(temp.pos[0]==13)){ms=-99999999999;} //DONT DO IT AGHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
 
             //AGGREGATE HEIGHT LAST 2 LINES NOT REALLY WORKING SDFISJFOJSEFIJDOSFJODSIJFOISDJFIO
             //DELTA HOLES?
