@@ -411,6 +411,23 @@ function getHoles(gb){
     return holes;
 }
 
+function tempClog(gb){
+    var l=gb;
+    var holes=0;
+    for(i=0;i<l.length;i++){
+        for(j=0;j<l[i].length;j++){
+            if(l[j][i]==true&&l[j+1][i]==false){
+                var t=(j+1);
+                while((t<l.length-1)&&l[t][i]==false){
+                    t++;
+                    holes++;
+                }
+            }
+        }
+    }
+    return holes;
+}
+
 function isClogging(x, gb, temp){
     if((temp.id==0||temp.id==1)&&(x+1)<width){
         var oldH=getColumnHeight(x+1, getGameBoard(getOccupiedSquares()));
@@ -455,7 +472,7 @@ var c_holes = -1.76;
 // var c_height = -0.51;
 var c_clear = 1.76;
 var c_low = 0.20;
-var c_bump = -0.184;
+var c_bump = -0.194;
 
 var c_clog=-3.5;
 
@@ -476,6 +493,8 @@ l.value=c_low;
 b.value=c_bump;
 
 //clogging constant (blocking off an open column)
+
+var ctr=0;
 
 function getBestMove(){
     var candidates=[];
@@ -499,7 +518,7 @@ function getBestMove(){
             var l=getTempOccupiedSquares(temp);
             var gb=getGameBoard(l);
             //var ms=((getHoles(l))*c_holes)+(c_low*temp.pos[1])+(c_clear*getCompleteLines(l));
-            var ms=((getHoles(gb)*c_holes)+(c_clear*getCompleteLines(gb))+/*(c_height*getAggregateHeight(gb))*/+(c_low*temp.pos[1])+(c_bump*getBumpiness(gb))+(c_clog*isClogging(temp.pos[0], gb, temp)));
+            var ms=((getHoles(gb)*c_holes)+(c_clear*getCompleteLines(gb))+/*(c_height*getAggregateHeight(gb))*/+(c_low*temp.pos[1])+(c_bump*getBumpiness(gb))+(c_clog*isClogging(temp.pos[0], gb, temp)));//c_clog**tempClog(gb)
             
             if(temp.id==1&&(r==2)&&(temp.pos[0]==13)){ms=-99999999999;} //DONT DO IT AGHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
 
@@ -511,9 +530,12 @@ function getBestMove(){
             //console.log((getAggregateHeight(l)));
             //most likely errors around here (ms), make sure to check b/c thats what it seems like
             //console.log(ms);
-            candidates.push(new Candidate(temp.pos[0], r, ms));
+            if(freeRot(temp)){
+                candidates.push(new Candidate(temp.pos[0], r, ms));
+            }
             rotate();
             r++;
+            test.push(tempClog(gb));
         }
         temp.pos=[temp.pos[0]+1, temp.pos[1]];
         x=temp.pos[0];
@@ -523,24 +545,67 @@ function getBestMove(){
         //get best candidate
         (candidates[i].moveScore>highestCandidate.moveScore)&&(highestCandidate=candidates[i]);
     }
-    for(i=0;i<highestCandidate.moveX;i++){ autoMoves.push(1); }
-    for(i=0;i<highestCandidate.rotation;i++){ autoMoves.push(2); }
-    autoMoves.push(3);
+    //for(i=0;i<highestCandidate.moveX;i++){ autoMoves.push(1); }
+    //console.log(autoMoves.filter(x => x === 1).length);
+    //console.log(highestCandidate.moveX);
+    autoMoves.push(highestCandidate.moveX);
+    //for(i=0;i<highestCandidate.rotation;i++){ autoMoves.push(2); }
+    //console.log(autoMoves.filter(x => x === 2).length);
+    //console.log(highestCandidate.rotation);
+    autoMoves.push(highestCandidate.rotation);
+    //autoMoves.push(3);
     //generate moves array for autoMove()
+
+    console.log(test);
+    debugger;
 }
 
 function autoMove(){
-    if(autoMoves[0]==0){left();}
-    else if(autoMoves[0]==1){right();}
-    else if(autoMoves[0]==2){rotate();}
-    else if(autoMoves[0]==3){quickDrop();}
-    else if(autoMoves[0]==4){holdPiece();}
-    autoMoves.shift();
+    // if(autoMoves[0]==0){left();}
+    // else if(autoMoves[0]==1){right();}
+    // else if(autoMoves[0]==2){rotate();}
+    // else if(autoMoves[0]==3){quickDrop();}
+    // else if(autoMoves[0]==4){holdPiece();}
+    //autoMoves.shift();
+    console.log(autoMoves);
+    if(ctr==0){
+        (pieces[0].pos=[(parseInt(pieces[0].pos)+parseInt(autoMoves[0])),pieces[0].pos[1]])
+        //for(i=0;i<autoMoves[0];i++){ right(); }
+        ctr++;
+    } else if(ctr==1){
+        var rot=autoMoves[1];
+        if(rot%4==0){
+            pieces[0].piecePos = pieceList[pieces[0].id];        
+        } else if(rot%4==1){
+            pieces[0].piecePos = firstInv[pieces[0].id];
+        } else if (rot%4==2){
+            pieces[0].piecePos = secondInv[pieces[0].id];
+        } else if (rot%4==3){
+            pieces[0].piecePos = thirdInv[pieces[0].id];
+        }
+        //JANKY ROTATION AHHH
+        ctr++;
+    } else{
+        quickDrop();
+        autoMoves=[];
+        ctr=0;
+    }
+    //debug(autoMoves[0]);/*autoMoves[0]*/
+    //pieces[0].pos=[(parseInt(pieces[0].pos)+parseInt(autoMoves[0])),pieces[0].pos[1]];
+    //for(i=0;i<autoMoves[0];i++){ right(); }
+    //for(i=0;i<autoMoves[1];i++){ rotate(); }
+    //quickDrop();
+    //autoMoves=[];
 }
 
 //INIT
 getBestMove();
-var autoSpeed=10;
+var autoSpeed=0;
+var aSpeed = document.getElementById("speed");
+aSpeed.value=autoSpeed;
+aSpeed.addEventListener("change", ()=>{
+    autoSpeed=aSpeed.value;
+})
 
 //   main game loop    //
 function loop(){
