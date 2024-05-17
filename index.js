@@ -453,8 +453,8 @@ class Candidate {
 
 var c_holes = -1.76;
 // var c_height = -0.51;
-var c_clear = 1.16;
-var c_low = 0.25;
+var c_clear = 1.76;
+var c_low = 0.20;
 var c_bump = -0.184;
 
 var c_clog=-3.5;
